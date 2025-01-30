@@ -1,12 +1,13 @@
 import streamlit as st
 import requests
-import mimetypes
-import base64
-import magic  # Install using `pip install python-magic`
+from openai import OpenAI
 
+gpt_Key = st.secrets["API_KEYS"]["Personal_GPT_Key"]
+client = OpenAI(api_key=gpt_Key)
+file_data = []
 
 def main():
-    MAKE_COM_WEBHOOK_URL = "https://hook.us2.make.com/6m3voepa1225gxksxocis3ow8oyygutp"
+    MAKE_COM_WEBHOOK_URL = "https://hook.us2.make.com/pxjavgk8qa3pmenqucl2cp2t7feh3h61"
     other_hook = "https://hook.us2.make.com/q7m1xgm52ugdzsx73lcrwv838on5glum"
     MAKE_COM_RESPONSE_URL = MAKE_COM_WEBHOOK_URL
 
@@ -15,7 +16,7 @@ def main():
     st.write(
         "Upload files below and ask a question about them – GPT will answer! "
     )
-
+    
     # Let the user upload files via `st.file_uploader`.
     uploaded_files = st.file_uploader("Upload Files", accept_multiple_files=True)
 
@@ -27,37 +28,20 @@ def main():
     )
 
     if st.button("Submit"):
-        file_data = []
         if uploaded_files:
-            mime = magic.Magic(mime=True)  # Create a magic instance
             for file in uploaded_files:
-                try:
-                    # Read file content
-                    file_content = file.read()
-
-                    # Identify file type using magic
-                    file_type = mime.from_buffer(file_content)
-
-                    # Base64 encode for transmission (optional)
-                    if not file_type.startswith("text/"):  # Skip encoding for text files
-                        encoded_data = base64.b64encode(file_content).decode("utf-8")
-                        file_content = encoded_data
-                    else:
-                        # Process file (e.g., convert to base64)
-                        file_content = file_content.decode('utf-8')  # Decode to handle potential encoding issues
-
-                    # Create file metadata
-                    file_metadata = {
-                        "filename": file.name,
-                        "content_type": file_type,
-                        "size": len(file_content),  # Add file size for potential checks
-                    }
-
-                    # Append data (no metadata for now) to the list
-                    file_data.append(file_content)
-                except Exception as e:
-                    st.error(f"Error processing file {file.name}: {e}")
-                    
+                # Upload the file to OpenAI so that it can be stored in the following vector store
+                f = client.files.create(
+                    file=file,
+                    purpose="assistants"
+                    )
+                # Add the file's id to file_data
+                file_data.append(f.id)
+                # Attach the file to the vector store assigned to assistant
+                vector_store_file = client.beta.vector_stores.files.create(
+                    vector_store_id="vs_cjcLeqY3t0N2j1x3hXMo6vDG",
+                    file_id=f.id
+                    )
         data = {
             "text_input": question,
             "file_data": file_data
@@ -77,6 +61,8 @@ def main():
             st.write("### GPT Response")
             st.write(gpt_response)
             
+            # Delete all the files from OpenAI once user's questions are answered
+            #[client.files.delete(f) for f in file_data]
         except requests.exceptions.RequestException as e:
             st.error(f"Error communicating with Make.com: {e}")
 
