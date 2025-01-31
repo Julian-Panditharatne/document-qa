@@ -12,18 +12,18 @@ def main():
     MAKE_COM_RESPONSE_URL = MAKE_COM_WEBHOOK_URL
 
     # Show title and description.
-    st.title("💬 Files Question Answering")
+    st.title("💬 Documents Question Answering")
     st.write(
-        "Upload files below and ask a question about them – GPT will answer! "
+        "Upload documents below and ask a question about them – GPT will answer! "
     )
     
     # Let the user upload files via `st.file_uploader`.
-    uploaded_files = st.file_uploader("Upload Files", accept_multiple_files=True)
+    uploaded_files = st.file_uploader("Upload Documents", accept_multiple_files=True)
 
     # Ask the user for a question via `st.text_area`.
     question = st.text_area(
-        "Now ask questions about the files!",
-        placeholder="Can you give me a short summary of these files?",
+        "Now ask questions about the documents!",
+        placeholder="Can you give me a short summary of these documents?",
         disabled=not uploaded_files
     )
 
