@@ -8,7 +8,6 @@ file_data = []
 
 def main():
     MAKE_COM_WEBHOOK_URL = "https://hook.us2.make.com/pxjavgk8qa3pmenqucl2cp2t7feh3h61"
-    other_hook = "https://hook.us2.make.com/q7m1xgm52ugdzsx73lcrwv838on5glum"
     MAKE_COM_RESPONSE_URL = MAKE_COM_WEBHOOK_URL
 
     # Show title and description.
@@ -49,22 +48,19 @@ def main():
 
         try:
             response = requests.post(MAKE_COM_WEBHOOK_URL, json=data)
-            response.raise_for_status()  # Raise an exception for bad status codes
 
-            # Send a request to Make.com to get the LLM response
-            response = requests.get(MAKE_COM_RESPONSE_URL)
-            response.raise_for_status() 
+            if response.status_code == 200:
+                gpt_response = response.text 
 
-            gpt_response = response.text 
-
-            st.success("Data sent to Make.com successfully!")
-            st.write("### GPT Response")
-            st.write(gpt_response)
-            
-            # Delete all the files from OpenAI once user's questions are answered
-            #[client.files.delete(f) for f in file_data]
+                st.success("Data sent to Make.com successfully!")
+                st.write("### GPT Response")
+                st.write(gpt_response)
+            else:
+                response.raise_for_status()  # Raise an exception for bad status codes
         except requests.exceptions.RequestException as e:
             st.error(f"Error communicating with Make.com: {e}")
 
 if __name__ == "__main__":
     main()
+    # Delete all the files from OpenAI once user's questions are answered
+    deletion = [client.files.delete(f) for f in file_data]
