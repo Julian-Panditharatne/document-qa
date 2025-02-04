@@ -60,7 +60,8 @@ def main():
         except requests.exceptions.RequestException as e:
             st.error(f"Error communicating with Make.com: {e}")
 
+        # Delete all the files from OpenAI once user's questions are answered
+        deletion = [client.files.delete(f) for f in file_data]
+        
 if __name__ == "__main__":
     main()
-    # Delete all the files from OpenAI once user's questions are answered
-    deletion = [client.files.delete(f) for f in file_data]
