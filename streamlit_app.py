@@ -50,7 +50,7 @@ def main():
                     # Add the file's id to file_data
                     st.session_state['file_data'].append(f.id)
                     # Attach the file to the vector store assigned to assistant
-                    vector_store_file = client.beta.vector_stores.files.create_and_poll(
+                    vector_store_file = client.vector_stores.files.create_and_poll(
                         vector_store_id="vs_cjcLeqY3t0N2j1x3hXMo6vDG",
                         file_id=f.id
                         )
