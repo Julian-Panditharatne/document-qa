@@ -89,7 +89,6 @@ def main():
                         viz_bytes.append(BytesIO(client.files.content(file_id=content.image_file.file_id).content))
                         st.session_state['viz_ids'].append(content.image_file.file_id)
 
-                st.success("Data sent to Make.com successfully!")
                 st.write("### GPT Response")
                 if viz_bytes != []: # Display the images of any charts/graphs if there were any.
                     st.image(viz_bytes, use_container_width=True)
