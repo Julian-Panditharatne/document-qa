@@ -71,7 +71,7 @@ def main():
             response = requests.post(MAKE_COM_WEBHOOK_URL, json=st.session_state['data'])
 
             if response.status_code == 200:
-                resp_text = response.text
+                resp_text = response.content.decode()
                 # Extract the message_ID and thread_ID from resp_text
                 resp_list = list(resp_text.rpartition('```\n'))
                 (message_ID, part, thread_ID) = resp_list.pop().rpartition(',') # thread_ID extracted
